@@ -4,7 +4,7 @@ body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     line-height: 1.6;
-    font-size: 18px;
+    font-size: 17px;
 }
 
 * {
@@ -30,7 +30,8 @@ img {
 
 .social-container {
     background: #eee;
-    padding: 25px 50px;
+    padding: 15px 5px;
+    align-items: center;
 }
 
 a.social {
