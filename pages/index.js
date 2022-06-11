@@ -1,8 +1,10 @@
 import Head from "next/head";
 import Layout, { siteTitle } from "../components/layout";
 import utilStyles from "../styles/utils.module.css";
+import "styles/global.module.css";
 import Link from "next/link";
 import Date from "../components/date";
+import SocialMedia from "./components/SocialMedia";
 
 import { getSortedPostsData } from "../lib/posts";
 
@@ -21,13 +23,14 @@ export default function Home({ allPostsData }) {
 			<Head>
 				<title>{siteTitle}</title>
 			</Head>
+			<SocialMedia />
 			<section className={utilStyles.headingMd}>
 				<p>
 					My name is Lindsey and I am a Full Stack Web Developer based in North
 					Carolina's gorgeous capital - Raleigh.
 				</p>
-				<p>
-					Be sure to check out my <a href='https://lindseyk.dev'>portfolio</a> &{" "}
+				<p className='container'>
+					Be sure to check out my <a href='https://lindseyk.dev'>Portfolio</a> &{" "}
 					<a href='http://github.com/codelikeagirl29'>GitHub</a>
 				</p>
 			</section>
