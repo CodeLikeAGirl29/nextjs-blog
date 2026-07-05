@@ -14,6 +14,16 @@ const POSTS_DIR = path.join(process.cwd(), "posts");
 // an RSS feed, a second Claude/OpenAI API call, a GitHub trending scrape, etc.
 const QUOTE_API = "https://zenquotes.io/api/random";
 
+// Used only if the API above is unreachable or rate-limited, so the daily
+// workflow always has something to file instead of failing outright.
+const FALLBACK_QUOTES = [
+  { text: "The best way to predict the future is to invent it.", author: "Alan Kay" },
+  { text: "Simplicity is prerequisite for reliability.", author: "Edsger W. Dijkstra" },
+  { text: "Programs must be written for people to read, and only incidentally for machines to execute.", author: "Harold Abelson" },
+  { text: "Make it work, make it right, make it fast.", author: "Kent Beck" },
+  { text: "A good plan violently executed now is better than a perfect plan next week.", author: "George S. Patton" },
+];
+
 function todayISO() {
   return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 }
@@ -31,22 +41,37 @@ function escapeYaml(str) {
 }
 
 async function fetchQuote() {
-  const res = await fetch(QUOTE_API, { headers: { Accept: "application/json" } });
-  if (!res.ok) {
-    throw new Error(`Quote API responded with ${res.status}`);
-  }
-  const data = await res.json();
-  const entry = Array.isArray(data) ? data[0] : data;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
 
-  return {
-    text: entry.q ?? entry.content ?? "No quote text returned.",
-    author: entry.a ?? entry.author ?? "Unknown",
-  };
+  try {
+    const res = await fetch(QUOTE_API, {
+      headers: { Accept: "application/json" },
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      throw new Error(`Quote API responded with ${res.status}`);
+    }
+    const data = await res.json();
+    const entry = Array.isArray(data) ? data[0] : data;
+
+    const text = entry.q ?? entry.content;
+    const author = entry.a ?? entry.author;
+    if (!text) throw new Error("Quote API returned no text");
+
+    return { text, author: author ?? "Unknown", source: "zenquotes.io" };
+  } catch (err) {
+    console.warn(`Falling back to local quotes (reason: ${err.message}).`);
+    const pick = FALLBACK_QUOTES[Math.floor(Math.random() * FALLBACK_QUOTES.length)];
+    return { ...pick, source: "local fallback" };
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 async function main() {
   const date = todayISO();
-  const { text, author } = await fetchQuote();
+  const { text, author, source } = await fetchQuote();
 
   const title = `Entry for ${date}`;
   const slug = `${date}-${slugify(author)}`;
@@ -61,7 +86,7 @@ async function main() {
     "---",
     `title: "${escapeYaml(title)}"`,
     `date: "${date}"`,
-    `source: "zenquotes.io"`,
+    `source: "${escapeYaml(source)}"`,
     `excerpt: "${escapeYaml(`A short note attributed to ${author}.`)}"`,
     "---",
     "",

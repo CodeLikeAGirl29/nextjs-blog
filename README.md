@@ -2,7 +2,7 @@
 
 A minimal Next.js blog where entries are markdown files in `/posts`, and a
 GitHub Actions workflow files a brand new entry every morning without any
-human touching the repo.
+human touching the repo. Deploys to Vercel.
 
 ## How it fits together
 
@@ -15,10 +15,14 @@ human touching the repo.
   automated.
 - `.github/workflows/daily-entry.yml` — runs the script on a schedule
   (`cron: "0 7 * * *"`, 07:00 UTC daily) and commits the new file straight
-  to `main`.
-- `.github/workflows/deploy.yml` — builds the static site and deploys it
-  to GitHub Pages after every push to `main`, including the commits the
-  bot makes.
+  to `main`. If the quote API is unreachable, `generate-post.mjs` falls
+  back to a small local quote list instead of failing the run.
+- `.github/workflows/ci.yml` — lints and builds on every push and pull
+  request to `main`, so a bad entry or a bad commit never reaches
+  production unnoticed. This runs independently of Vercel's own build.
+- `scripts/generate-feed.mjs` — regenerates `public/feed.xml` from
+  `/posts` automatically before every build (wired in as `prebuild`), so
+  the RSS feed at `/feed.xml` is always current.
 
 ## Run it locally
 
@@ -28,17 +32,22 @@ npm run dev        # http://localhost:3000
 npm run generate:post   # manually file a new entry
 ```
 
-## Ship it
+## Ship it (Vercel)
 
 1. Push this repo to GitHub.
-2. Repo Settings → Pages → set Source to "GitHub Actions".
-3. If deploying to `https://<user>.github.io/<repo>/` (not a custom domain
-   or a `<user>.github.io` repo), uncomment and set `basePath` in
-   `next.config.mjs`.
-4. The "Daily entry" workflow needs `contents: write` permission, which is
+2. In the [Vercel dashboard](https://vercel.com/new), import the repo.
+   Framework preset "Next.js" is auto-detected — no config needed.
+3. Deploy. Vercel builds and hosts it, and every future push to `main`
+   (including the bot's daily commits) triggers a new deployment
+   automatically. Pull requests get their own preview deployments too.
+4. Set `SITE_URL` at the top of `scripts/generate-feed.mjs` to your
+   `*.vercel.app` domain (or custom domain), so the RSS feed's links are
+   correct.
+5. The "Daily entry" workflow needs `contents: write` permission, which is
    already set in the workflow file. Nothing else to configure — the
-   built-in `GITHUB_TOKEN` handles the push.
-5. Trigger the first run by hand from the Actions tab
+   built-in `GITHUB_TOKEN` handles the push, and Vercel picks up the
+   resulting commit on its own.
+6. Trigger the first run by hand from the Actions tab
    ("Daily entry" → "Run workflow") instead of waiting for the schedule.
 
 ## Swap the source

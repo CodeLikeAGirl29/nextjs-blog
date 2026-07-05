@@ -21,8 +21,14 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://field-notes-nextjs.vercel.app"),
   title: "Field Notes",
   description: "A daily log of quotes and short reflections, auto-filed every morning.",
+  alternates: {
+    types: {
+      "application/rss+xml": "/feed.xml",
+    },
+  },
 };
 
 export default function RootLayout({
@@ -48,8 +54,11 @@ export default function RootLayout({
             <span className="font-mono text-xs text-muted">Vol. {new Date().getFullYear()}</span>
           </header>
           {children}
-          <footer className="mt-20 border-t border-border pt-6 font-mono text-xs text-muted">
-            Entries are drawn and filed each morning by a scheduled job. Nothing here is edited by hand.
+          <footer className="mt-20 flex items-center justify-between border-t border-border pt-6 font-mono text-xs text-muted">
+            <span>Entries are drawn and filed each morning by a scheduled job. Nothing here is edited by hand.</span>
+            <a href="/feed.xml" className="shrink-0 pl-4 underline hover:text-ink">
+              RSS
+            </a>
           </footer>
         </div>
       </body>
