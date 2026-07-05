@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #e8e4dc;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(31, 41, 55, 0.05) 1px, transparent 0);
+  background-size: 22px 22px;
+}
+
+::selection {
+  background: #4a6c6f;
+  color: #f3f0e9;
+}
+
+:focus-visible {
+  outline: 2px solid #4a6c6f;
+  outline-offset: 2px;
+}
+
+.punch-hole {
+  position: absolute;
+  top: 1.1rem;
+  left: 1.1rem;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 9999px;
+  background: #e8e4dc;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1.5px solid #4a6c6f;
+  color: #33494b;
+  padding: 0.15rem 0.55rem;
+  border-radius: 2px;
+  transform: rotate(-2deg);
+  letter-spacing: 0.08em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card-enter {
+    animation: card-in 0.5s ease-out both;
+  }
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
