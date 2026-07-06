@@ -23,6 +23,18 @@ human touching the repo. Deploys to Vercel.
 - `scripts/generate-feed.mjs` — regenerates `public/feed.xml` from
   `/posts` automatically before every build (wired in as `prebuild`), so
   the RSS feed at `/feed.xml` is always current.
+- `app/sitemap.ts` / `app/robots.ts` — Next.js's built-in file conventions;
+  these auto-serve `/sitemap.xml` and `/robots.txt` with no extra script.
+- `components/PostExplorer.tsx` — client-side search box + tag filter
+  chips over the full post list, shown on the home page.
+- `components/ThemeToggle.tsx` — light/dark mode toggle. Color tokens live
+  as CSS variables in `globals.css` (`:root` vs `.dark`), so the rest of
+  the app never references a hex value directly.
+- `app/tags/` — `/tags` lists every tag in use; `/tags/[tag]` lists every
+  entry under one tag.
+- Each post page has per-post metadata (`generateMetadata`) for SEO/Open
+  Graph, a "copy quote" button, and older/newer navigation between
+  entries.
 
 ## Run it locally
 

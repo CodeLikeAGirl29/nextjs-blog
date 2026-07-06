@@ -89,6 +89,8 @@ async function main() {
     `source: "${escapeYaml(source)}"`,
     `excerpt: "${escapeYaml(`A short note attributed to ${author}.`)}"`,
     `tags: ["quote"]`,
+    `quote: "${escapeYaml(text.trim())}"`,
+    `author: "${escapeYaml(author)}"`,
     "---",
     "",
   ].join("\n");

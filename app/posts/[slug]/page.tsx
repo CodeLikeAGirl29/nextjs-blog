@@ -1,12 +1,39 @@
 import Link from "next/link";
-import { getAllPostSlugs, getPostBySlug } from "@/lib/posts";
+import type { Metadata } from "next";
+import { getAllPostSlugs, getPostBySlug, getAdjacentPosts } from "@/lib/posts";
+import CopyQuoteButton from "@/components/CopyQuoteButton";
 
 export async function generateStaticParams() {
   return getAllPostSlugs();
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const post = await getPostBySlug(params.slug);
+  const description = post.excerpt || `An entry filed on ${post.date}.`;
+
+  return {
+    title: post.title,
+    description,
+    alternates: {
+      canonical: `/posts/${post.slug}`,
+    },
+    openGraph: {
+      title: post.title,
+      description,
+      type: "article",
+      publishedTime: post.date,
+      url: `/posts/${post.slug}`,
+    },
+  };
+}
+
 export default async function PostPage({ params }: { params: { slug: string } }) {
   const post = await getPostBySlug(params.slug);
+  const { older, newer } = getAdjacentPosts(params.slug);
 
   return (
     <main>
@@ -32,6 +59,13 @@ export default async function PostPage({ params }: { params: { slug: string } })
           className="prose prose-neutral mt-6 max-w-none font-body prose-p:leading-relaxed prose-p:text-ink"
           dangerouslySetInnerHTML={{ __html: post.contentHtml }}
         />
+
+        {post.quote && post.author && (
+          <div className="mt-4">
+            <CopyQuoteButton quote={post.quote} author={post.author} />
+          </div>
+        )}
+
         {post.tags.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-1.5 border-t border-border pt-4">
             {post.tags.map((tag) => (
@@ -42,6 +76,25 @@ export default async function PostPage({ params }: { params: { slug: string } })
           </div>
         )}
       </article>
+
+      {(older || newer) && (
+        <nav className="mt-6 flex items-center justify-between font-mono text-xs text-muted">
+          {older ? (
+            <Link href={`/posts/${older.slug}`} className="hover:text-ink">
+              &larr; {older.date}
+            </Link>
+          ) : (
+            <span />
+          )}
+          {newer ? (
+            <Link href={`/posts/${newer.slug}`} className="hover:text-ink">
+              {newer.date} &rarr;
+            </Link>
+          ) : (
+            <span />
+          )}
+        </nav>
+      )}
     </main>
   );
 }
