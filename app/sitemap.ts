@@ -16,6 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     { url: SITE_URL, changeFrequency: "daily", priority: 1 },
+    { url: `${SITE_URL}/about`, changeFrequency: "monthly" },
     { url: `${SITE_URL}/tags`, changeFrequency: "weekly" },
     ...postEntries,
     ...tagEntries,

@@ -68,7 +68,15 @@ export default function RootLayout({
                 a daily log, filed automatically
               </p>
             </a>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
+              <nav className="flex items-center gap-3 font-mono text-xs text-muted">
+                <a href="/tags" className="hover:text-ink">
+                  tags
+                </a>
+                <a href="/about" className="hover:text-ink">
+                  about
+                </a>
+              </nav>
               <span className="font-mono text-xs text-muted">Vol. {new Date().getFullYear()}</span>
               <ThemeToggle />
             </div>
