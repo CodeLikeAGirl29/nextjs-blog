@@ -12,16 +12,20 @@ export interface PostMeta {
   date: string;
   source?: string;
   excerpt?: string;
+  tags: string[];
 }
 
 export interface Post extends PostMeta {
   contentHtml: string;
 }
 
-export function getSortedPostsMeta(): PostMeta[] {
+function readAllPostFiles(): string[] {
   if (!fs.existsSync(postsDirectory)) return [];
+  return fs.readdirSync(postsDirectory).filter((f) => f.endsWith(".md"));
+}
 
-  const fileNames = fs.readdirSync(postsDirectory).filter((f) => f.endsWith(".md"));
+export function getSortedPostsMeta(): PostMeta[] {
+  const fileNames = readAllPostFiles();
 
   const posts = fileNames.map((fileName) => {
     const slug = fileName.replace(/\.md$/, "");
@@ -35,6 +39,7 @@ export function getSortedPostsMeta(): PostMeta[] {
       date: data.date ?? "",
       source: data.source ?? "",
       excerpt: data.excerpt ?? "",
+      tags: Array.isArray(data.tags) ? data.tags : [],
     };
   });
 
@@ -42,11 +47,17 @@ export function getSortedPostsMeta(): PostMeta[] {
 }
 
 export function getAllPostSlugs() {
-  if (!fs.existsSync(postsDirectory)) return [];
-  return fs
-    .readdirSync(postsDirectory)
-    .filter((f) => f.endsWith(".md"))
-    .map((fileName) => ({ slug: fileName.replace(/\.md$/, "") }));
+  return readAllPostFiles().map((fileName) => ({ slug: fileName.replace(/\.md$/, "") }));
+}
+
+export function getAllTags(): string[] {
+  const tagSet = new Set<string>();
+  getSortedPostsMeta().forEach((post) => post.tags.forEach((tag) => tagSet.add(tag)));
+  return Array.from(tagSet).sort();
+}
+
+export function getPostsByTag(tag: string): PostMeta[] {
+  return getSortedPostsMeta().filter((post) => post.tags.includes(tag));
 }
 
 export async function getPostBySlug(slug: string): Promise<Post> {
@@ -63,6 +74,7 @@ export async function getPostBySlug(slug: string): Promise<Post> {
     date: data.date ?? "",
     source: data.source ?? "",
     excerpt: data.excerpt ?? "",
+    tags: Array.isArray(data.tags) ? data.tags : [],
     contentHtml,
   };
 }

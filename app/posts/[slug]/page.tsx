@@ -32,6 +32,15 @@ export default async function PostPage({ params }: { params: { slug: string } })
           className="prose prose-neutral mt-6 max-w-none font-body prose-p:leading-relaxed prose-p:text-ink"
           dangerouslySetInnerHTML={{ __html: post.contentHtml }}
         />
+        {post.tags.length > 0 && (
+          <div className="mt-6 flex flex-wrap gap-1.5 border-t border-border pt-4">
+            {post.tags.map((tag) => (
+              <Link key={tag} href={`/tags/${tag}`} className="tag-pill font-mono">
+                #{tag}
+              </Link>
+            ))}
+          </div>
+        )}
       </article>
     </main>
   );

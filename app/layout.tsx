@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Fraunces, Inter, IBM_Plex_Mono } from "next/font/google";
+import ThemeToggle from "@/components/ThemeToggle";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -41,6 +43,21 @@ export default function RootLayout({
       <body
         className={`${fraunces.variable} ${inter.variable} ${plexMono.variable} font-body text-ink antialiased`}
       >
+        {/* Runs before hydration so the page never flashes the wrong theme. */}
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`
+            (function () {
+              try {
+                var stored = localStorage.getItem("theme");
+                var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                if (stored === "dark" || (!stored && prefersDark)) {
+                  document.documentElement.classList.add("dark");
+                }
+              } catch (e) {}
+            })();
+          `}
+        </Script>
+
         <div className="mx-auto max-w-2xl px-6 py-14">
           <header className="mb-14 flex items-end justify-between border-b border-border pb-4">
             <a href="/" className="group">
@@ -51,7 +68,10 @@ export default function RootLayout({
                 a daily log, filed automatically
               </p>
             </a>
-            <span className="font-mono text-xs text-muted">Vol. {new Date().getFullYear()}</span>
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-xs text-muted">Vol. {new Date().getFullYear()}</span>
+              <ThemeToggle />
+            </div>
           </header>
           {children}
           <footer className="mt-20 flex items-center justify-between border-t border-border pt-6 font-mono text-xs text-muted">
