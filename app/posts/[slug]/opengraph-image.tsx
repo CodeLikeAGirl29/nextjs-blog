@@ -1,10 +1,17 @@
 import { ImageResponse } from "next/og";
-import { getPostBySlug } from "@/lib/posts";
+import { getPostBySlug, getAllPosts } from "@/lib/posts";
 
 export const runtime = "nodejs"; // needs fs access via getPostBySlug
 export const alt = "Field Notes entry";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+
+export async function generateStaticParams() {
+  const posts = await getAllPosts();
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
+}
 
 export default async function Image({ params }: { params: { slug: string } }) {
   const post = await getPostBySlug(params.slug);
@@ -45,7 +52,14 @@ export default async function Image({ params }: { params: { slug: string } }) {
           >
             {post.date}
           </div>
-          <div style={{ display: "flex", fontSize: 24, color: "#6B6459", letterSpacing: 2 }}>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 24,
+              color: "#6B6459",
+              letterSpacing: 2,
+            }}
+          >
             FIELD NOTES
           </div>
         </div>
@@ -67,7 +81,11 @@ export default async function Image({ params }: { params: { slug: string } }) {
               fontStyle: "italic",
             }}
           >
-            &ldquo;{displayText.length > 180 ? `${displayText.slice(0, 180)}…` : displayText}&rdquo;
+            &ldquo;
+            {displayText.length > 180
+              ? `${displayText.slice(0, 180)}…`
+              : displayText}
+            &rdquo;
           </div>
           {displayAuthor && (
             <div style={{ display: "flex", fontSize: 28, color: "#6B6459" }}>
@@ -81,6 +99,6 @@ export default async function Image({ params }: { params: { slug: string } }) {
         </div>
       </div>
     ),
-    { ...size }
+    { ...size },
   );
 }
