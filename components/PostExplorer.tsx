@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { PostMeta } from "@/lib/posts";
 import PostCard from "./PostCard";
+
+const PAGE_SIZE = 8;
 
 export default function PostExplorer({
   posts,
@@ -13,6 +15,7 @@ export default function PostExplorer({
 }) {
   const [query, setQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -27,6 +30,14 @@ export default function PostExplorer({
     });
   }, [posts, query, activeTag]);
 
+  // Reset pagination whenever the active filters change, so "show more"
+  // always starts from a full first page of the new result set.
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [query, activeTag]);
+
+  const visible = filtered.slice(0, visibleCount);
+  const hasMore = filtered.length > visible.length;
   const hasActiveFilters = query.trim().length > 0 || activeTag !== null;
 
   return (
@@ -78,11 +89,23 @@ export default function PostExplorer({
           No entries match &ldquo;{query}&rdquo;{activeTag ? ` in #${activeTag}` : ""}.
         </p>
       ) : (
-        <div className="flex flex-col gap-5">
-          {filtered.map((post, i) => (
-            <PostCard key={post.slug} post={post} index={i} />
-          ))}
-        </div>
+        <>
+          <div className="flex flex-col gap-5">
+            {visible.map((post, i) => (
+              <PostCard key={post.slug} post={post} index={i} />
+            ))}
+          </div>
+
+          {hasMore && (
+            <button
+              type="button"
+              onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+              className="mt-6 w-full rounded-sm border border-border bg-card py-2 font-mono text-xs text-muted transition hover:border-stamp hover:text-ink"
+            >
+              Show more ({filtered.length - visible.length} remaining)
+            </button>
+          )}
+        </>
       )}
     </div>
   );
