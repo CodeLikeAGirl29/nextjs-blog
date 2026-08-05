@@ -6,47 +6,7 @@ A minimal Next.js blog where every entry is a markdown file in `/posts` — and 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://vercel.com/)
 
-<<<<<<< HEAD
-- `posts/*.md` — each file is one entry (frontmatter: `title`, `date`,
-  `source`, `excerpt`).
-- `lib/posts.ts` — reads and parses those files at build time.
-- `app/` — Next.js App Router pages that render the list and each entry.
-- `scripts/generate-post.mjs` — pulls a quote from a public API and writes
-  a new dated markdown file into `/posts`. This is the piece that gets
-  automated.
-- `.github/workflows/daily-entry.yml` — runs the script on a schedule
-  (`cron: "0 7 * * *"`, 07:00 UTC daily) and commits the new file straight
-  to `main`. If the quote API is unreachable, `generate-post.mjs` falls
-  back to a small local quote list instead of failing the run.
-- `.github/workflows/ci.yml` — lints and builds on every push and pull
-  request to `main`, so a bad entry or a bad commit never reaches
-  production unnoticed. This runs independently of Vercel's own build.
-- `scripts/generate-feed.mjs` — regenerates `public/feed.xml` from
-  `/posts` automatically before every build (wired in as `prebuild`), so
-  the RSS feed at `/feed.xml` is always current.
-- `app/sitemap.ts` / `app/robots.ts` — Next.js's built-in file conventions;
-  these auto-serve `/sitemap.xml` and `/robots.txt` with no extra script.
-- `components/PostExplorer.tsx` — client-side search box + tag filter
-  chips over the full post list, shown on the home page.
-- `components/ThemeToggle.tsx` — light/dark mode toggle. Color tokens live
-  as CSS variables in `globals.css` (`:root` vs `.dark`), so the rest of
-  the app never references a hex value directly.
-- `app/tags/` — `/tags` lists every tag in use; `/tags/[tag]` lists every
-  entry under one tag.
-- Each post page has per-post metadata (`generateMetadata`) for SEO/Open
-  Graph, a "copy quote" button, and older/newer navigation between
-  entries.
-- `app/posts/[slug]/opengraph-image.tsx` / `app/opengraph-image.tsx` —
-  dynamically generated social preview images (Next.js's `next/og`), so
-  links shared on social media show the actual quote, not a generic card.
-- `app/about/page.tsx` — a short colophon explaining how the automation
-  works.
-- The home page paginates with a "show more" button (8 entries per page)
-  instead of rendering the entire archive at once, and resets to the
-  first page whenever search or tag filters change.
-=======
 ## Table of Contents
->>>>>>> 4c3d67a49c2db0ab07864fd58e794e384912af85
 
 - [About](#about)
 - [How It Fits Together](#how-it-fits-together)
